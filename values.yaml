@@ -11,23 +11,32 @@ cp-zookeeper:
   imagePullSecrets:
   #  - name: "regcred"
   heapOptions: "-Xms512M -Xmx512M"
+
   persistence:
-    enabled: false
-    ## The size of the PersistentVolume to allocate to each Zookeeper Pod in the StatefulSet. For
-    ## production servers this number should likely be much larger.
-    ##
-    ## Size for Data dir, where ZooKeeper will store the in-memory database snapshots.
-    dataDirSize: 10Gi
-    # dataDirStorageClass: ""
-    ## Size for data log dir, which is a dedicated log device to be used, and helps avoid competition between logging and snaphots.
-    dataLogDirSize: 10Gi
-    # dataLogDirStorageClass: ""
-    
-  # TODO: find correct security context for user in this zk-image  
-  securityContext: 
+    enabled: true
+    dataDirStorageClass: "cp-kafka"
+    dataDirSize: "10Gi"
+    dataLogDirStorageClass: "cp-kafka"
+    dataLogDirSize: "5Gi"
+
+  # persistence:
+  #   enabled: true
+  ## The size of the PersistentVolume to allocate to each Zookeeper Pod in the StatefulSet. For
+  ## production servers this number should likely be much larger.
+  ##
+  ## Size for Data dir, where ZooKeeper will store the in-memory database snapshots.
+  # dataDirSize: 10Gi
+  # dataDirStorageClass: "zookeeper-gp2"
+  ## Size for data log dir, which is a dedicated log device to be used, and helps avoid competition between logging and snaphots.
+  # dataLogDirSize: 10Gi
+  # dataLogDirStorageClass: "zookeeper-gp2"
+
+  # TODO: find correct security context for user in this zk-image
+  securityContext:
     runAsUser: 0
 
   resources: {}
+
   ## If you do want to specify resources, uncomment the following lines, adjust them as necessary,
   ## and remove the curly braces after 'resources:'
   #  limits:
@@ -51,8 +60,8 @@ cp-kafka:
   #  - name: "regcred"
   heapOptions: "-Xms512M -Xmx512M"
   persistence:
-    enabled: false
-    # storageClass: ""
+    enabled: true
+    storageClass: "cp-kafka"
     size: 5Gi
     disksPerBroker: 1
   resources: {}
@@ -64,7 +73,7 @@ cp-kafka:
   #  requests:
   #   cpu: 100m
   #   memory: 128Mi
-  securityContext: 
+  securityContext:
     runAsUser: 0
 
 ## ------------------------------------------------------
@@ -146,7 +155,7 @@ cp-ksql-server:
   #  - name: "regcred"
   heapOptions: "-Xms512M -Xmx512M"
   ksql:
-    headless: true
+    headless: false
 
 ## ------------------------------------------------------
 ## Control Center
@@ -169,3 +178,15 @@ cp-control-center:
   #  requests:
   #   cpu: 100m
   #   memory: 128Mi
+
+  kafka:
+    bootstrapServers: "PLAINTEXT://my-confluent-cp-kafka:9092"
+
+  cp-kafka-connect:
+    url: "my-confluent-cp-kafka-connect:8083"
+
+  cp-ksql-server:
+    url: "my-confluent-cp-ksql-server:8088"
+
+  cp-zookeeper:
+    url: "my-confluent-cp-zookeeper:2181"

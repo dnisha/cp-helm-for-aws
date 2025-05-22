@@ -21,7 +21,7 @@ imagePullSecrets:
 serviceHttpPort: 9021
 
 ## Control Center properties
-## ref: 
+## ref:
 configurationOverrides:
   "replication.factor": "3"
   # "internal.topics.replication": "1"
@@ -38,7 +38,8 @@ heapOptions: "-Xms512M -Xmx512M"
 ## Additional env variables
 customEnv: {}
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -91,8 +92,6 @@ prometheus:
 kafka:
   bootstrapServers: ""
 
-## If the Kafka Chart is disabled a URL and port are required to connect
-## e.g. gnoble-panther-cp-schema-registry:8081
 cp-schema-registry:
   url: ""
 
@@ -104,4 +103,4 @@ cp-ksql-server:
 
 cp-zookeeper:
   ## If the Zookeeper Chart is disabled a URL and port are required to connect
-  url: ""  
+  url: ""
