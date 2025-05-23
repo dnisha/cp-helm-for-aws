@@ -42,7 +42,8 @@ heapOptions: "-Xms512M -Xmx512M"
 kafka:
   bootstrapServers: ""
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -71,11 +72,11 @@ affinity: {}
 
 ## Privilege and access control settings for a Pod or Container
 ## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-securityContext:
-  runAsUser: 10001
-  runAsGroup: 10001
-  fsGroup: 10001
-  runAsNonRoot: true
+# securityContext:
+#   runAsUser: 10001
+#   runAsGroup: 10001
+#   fsGroup: 10001
+#   runAsNonRoot: false
 
 ## Monitoring
 ## Schema Registry JMX Settings
@@ -89,7 +90,7 @@ prometheus:
   ## JMX Exporter Configuration
   ## ref: https://github.com/prometheus/jmx_exporter
   jmx:
-    enabled: true
+    enabled: false
     image: solsson/kafka-prometheus-jmx-exporter@sha256
     imageTag: 6f82e2b0464f50da8104acd7363fb9b995001ddff77d248379f8788e78946143
     imagePullPolicy: IfNotPresent

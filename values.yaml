@@ -19,8 +19,6 @@ cp-zookeeper:
     dataLogDirStorageClass: "cp-kafka"
     dataLogDirSize: "5Gi"
 
-  # persistence:
-  #   enabled: true
   ## The size of the PersistentVolume to allocate to each Zookeeper Pod in the StatefulSet. For
   ## production servers this number should likely be much larger.
   ##
@@ -80,14 +78,38 @@ cp-kafka:
 ## Schema Registry
 ## ------------------------------------------------------
 cp-schema-registry:
-  enabled: false
+  enabled: true
   image: confluentinc/cp-schema-registry
-  imageTag: 6.1.0
+  imageTag: 7.9.0
   ## Optionally specify an array of imagePullSecrets. Secrets must be manually created in the namespace.
   ## https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
   imagePullSecrets:
   #  - name: "regcred"
   heapOptions: "-Xms512M -Xmx512M"
+
+  securityContext:
+    runAsUser: 0
+    runAsNonRoot: false
+
+  # Add these environment variables to override any default JVM settings
+  configurationOverrides:
+    KAFKA_HEAP_OPTS: "-Xmx512M -Xms512M"
+    SCHEMA_REGISTRY_HEAP_OPTS: "-Xmx512M -Xms512M"
+
+    # Set explicit resource limits
+  # resources:
+  #   limits:
+  #     memory: "1Gi"  # Slightly more than heap max
+  #     cpu: "500m"
+  #   requests:
+  #     memory: "768Mi"
+  #     cpu: "200m"
+
+  # Add these custom environment variables
+  customEnv:
+    JAVA_TOOL_OPTIONS: "-Xmx512M -Xms512M"
+    JVM_OPTS: "-Xmx512M -Xms512M"
+
   resources: {}
   ## If you do want to specify resources, uncomment the following lines, adjust them as necessary,
   ## and remove the curly braces after 'resources:'
@@ -97,6 +119,8 @@ cp-schema-registry:
   #  requests:
   #   cpu: 100m
   #   memory: 128Mi
+  kafka:
+    bootstrapServers: "PLAINTEXT://my-confluent-cp-kafka:9092"
 
 ## ------------------------------------------------------
 ## REST Proxy
@@ -104,7 +128,7 @@ cp-schema-registry:
 cp-kafka-rest:
   enabled: false
   image: confluentinc/cp-kafka-rest
-  imageTag: 6.1.0
+  imageTag: 7.9.0
   ## Optionally specify an array of imagePullSecrets. Secrets must be manually created in the namespace.
   ## https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
   imagePullSecrets:
@@ -141,6 +165,11 @@ cp-kafka-connect:
   #  requests:
   #   cpu: 100m
   #   memory: 128Mi
+  kafka:
+    bootstrapServers: "PLAINTEXT://my-confluent-cp-kafka:9092"
+
+  cp-schema-registry:
+    url: "my-confluent-cp-schema-registry:8081"
 
 ## ------------------------------------------------------
 ## KSQL Server
@@ -156,6 +185,9 @@ cp-ksql-server:
   heapOptions: "-Xms512M -Xmx512M"
   ksql:
     headless: false
+
+  kafka:
+    bootstrapServers: "PLAINTEXT://my-confluent-cp-kafka:9092"
 
 ## ------------------------------------------------------
 ## Control Center
@@ -190,3 +222,6 @@ cp-control-center:
 
   cp-zookeeper:
     url: "my-confluent-cp-zookeeper:2181"
+
+  cp-schema-registry:
+    url: "my-confluent-cp-schema-registry:8081"
